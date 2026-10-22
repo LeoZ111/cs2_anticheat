@@ -8,7 +8,7 @@ Er entsteht in kleinen Aufgaben. Jede Aufgabe ist ein echtes Stück des Trackers
 | Aufgabe | Was | Status |
 | --- | --- | --- |
 | 1 | Steam-IDs aus einer Datei lesen | fertig (Lösung von Claude) |
-| 2 | Bann-Status über die Steam-API abfragen | offen |
+| 2 | Bann-Status über die Steam-API abfragen | fertig (Lösung von Claude) |
 | 3 | Ergebnisse in einer kleinen Datenbank speichern | kommt |
 | 4 | Täglicher Abgleich und Bericht | kommt |
 
@@ -158,11 +158,22 @@ Den Aufbau mit Liste und `.append(...)` kennst du schon aus Aufgabe 1.
 
 </details>
 
-### Später: mit echtem Schlüssel ausprobieren (freiwillig)
+### Mit echtem Schlüssel ausprobieren
 
-Einen eigenen Schlüssel bekommst du auf steamcommunity.com/dev/apikey. **Nie in eine Datei im Repo schreiben und nie
-teilen.** Für ein PowerShell-Fenster setzt du ihn so (gilt nur, bis du das Fenster schließt):
+1. Schlüssel holen auf steamcommunity.com/dev/apikey (bei „Domain“ reicht z. B. `localhost`). **Nie in eine Datei im
+   Repo schreiben und nie teilen**, auch nicht mit Claude.
+2. Einmalig speichern (PowerShell). Der Befehl fragt nach dem Schlüssel, so landet er nicht im Befehlsverlauf:
 
-```
-$env:STEAM_API_KEY = "dein-schlüssel"
-```
+   ```
+   [Environment]::SetEnvironmentVariable("STEAM_API_KEY", (Read-Host "Steam API Key"), "User")
+   ```
+
+   Danach ein **neues** Terminal öffnen, erst dort ist der Schlüssel da.
+3. Eine Datei `data/ids.txt` anlegen, eine Steam-ID pro Zeile. Der Ordner `data/` wird nie committet.
+4. Im Ordner `tracker`:
+
+   ```
+   python -m tracker data/ids.txt
+   ```
+
+   Ausgabe: wie viele Spieler geprüft wurden, wie viele gebannt sind, und die gebannten IDs.

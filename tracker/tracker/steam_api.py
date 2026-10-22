@@ -45,14 +45,20 @@ def parse_bans(response: dict) -> list[dict]:
 
         [{"steam_id": "76561198000000001", "vac_bans": 1, "game_bans": 0, "days_since_last_ban": 12}]
     """
-    # TODO(leo): Aufgabe 2a, siehe tracker/README.md
-    raise NotImplementedError("Aufgabe 2a: siehe tracker/README.md")
+    players = []
+    for player in response["players"]:
+        players.append({
+            "steam_id": player["SteamId"],
+            "vac_bans": player["NumberOfVACBans"],
+            "game_bans": player["NumberOfGameBans"],
+            "days_since_last_ban": player["DaysSinceLastBan"],
+        })
+    return players
 
 
 def is_banned(player: dict) -> bool:
     """Return True if the player has at least one VAC ban or game ban."""
-    # TODO(leo): Aufgabe 2b, siehe tracker/README.md
-    raise NotImplementedError("Aufgabe 2b: siehe tracker/README.md")
+    return player["vac_bans"] > 0 or player["game_bans"] > 0
 
 
 def fetch_bans(steam_ids: list[str], api_key: str) -> list[dict]:

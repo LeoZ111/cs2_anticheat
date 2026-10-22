@@ -45,10 +45,17 @@ Am Ende steht `Bestanden!` (oder `Passed!`) mit der Zahl der Tests.
 
 | Im Chat | Was passiert |
 | --- | --- |
+| `!` | Alle Befehle alphabetisch, mit Erklärung |
+| `!b` | Alle Befehle, die mit „b“ anfangen |
+| `!bot_s pro` | Abkürzung: passt der Anfang zu genau einem Befehl, wird er ausgeführt |
 | `!bot_skill` | Menü mit allen Stufen im Chat, Auswahl mit `!1` bis `!5` |
 | `!bot_skill noob` / `mid` / `hard` / `pro` / `legend` | Bots werden nacheinander ersetzt, mit dieser Stärke |
 
-Mit `/` statt `!` sehen die anderen den Befehl nicht im Chat. Die Bots werden im Abstand von einer halben Sekunde
+Mit `/` statt `!` sehen die anderen den Befehl nicht im Chat.
+
+Echtes Tab-Vervollständigen beim Tippen gibt es in CS2 nicht: Der Server sieht eine Nachricht erst nach Enter.
+Darum zeigt `!` + Anfang + Enter die passenden Befehle. **Jeder neue Chat-Befehl muss in `AntiCheatPlugin.cs` bei
+`ChatHelp.Register` eingetragen werden**, sonst taucht er in der Liste nicht auf. Die Bots werden im Abstand von einer halben Sekunde
 ersetzt. Alle auf einmal hat Spieler mit einem „Überlauf“-Fehler vom Server geworfen.
 
 Für Fehlersuche gibt es in der Server-Konsole `css_ac_bots`: zeigt Rundenstatus und die Positionen aller Bots.

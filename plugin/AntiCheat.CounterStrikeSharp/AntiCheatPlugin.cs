@@ -1,5 +1,6 @@
 using System.Numerics;
 using AntiCheat.Core.Geometry;
+using AntiCheat.Core.TestMode;
 using AntiCheat.CounterStrikeSharp.TestMode;
 using CounterStrikeSharp.API.Core;
 using Microsoft.Extensions.Logging;
@@ -25,6 +26,12 @@ public class AntiCheatPlugin : BasePlugin
         // Test-mode commands. Only for our own test server.
         BotSkillCommand.Register(this);
         BotPositionsCommand.Register(this);
+
+        // Every chat command must be listed here, so "!" and "!<beginning>" can show it.
+        ChatHelp.Register(this, new[]
+        {
+            new ChatCommandInfo("bot_skill", "[" + string.Join("|", BotSkill.AllNames.Split(", ")) + "]", "Bot-Stärke einstellen (ohne Angabe: Menü)"),
+        });
     }
 
     // A tiny line-of-sight check, so we see in the server console that the core runs there too.

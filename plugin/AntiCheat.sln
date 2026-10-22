@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntiCheat.Core", "AntiCheat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntiCheat.Core.Tests", "AntiCheat.Core.Tests\AntiCheat.Core.Tests.csproj", "{7C86548B-4A65-40C3-ABCF-A8FCDED3CF0B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntiCheat.CounterStrikeSharp", "AntiCheat.CounterStrikeSharp\AntiCheat.CounterStrikeSharp.csproj", "{29CB6A23-8891-485F-B398-1D4A01F1F008}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{7C86548B-4A65-40C3-ABCF-A8FCDED3CF0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C86548B-4A65-40C3-ABCF-A8FCDED3CF0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C86548B-4A65-40C3-ABCF-A8FCDED3CF0B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{29CB6A23-8891-485F-B398-1D4A01F1F008}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29CB6A23-8891-485F-B398-1D4A01F1F008}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29CB6A23-8891-485F-B398-1D4A01F1F008}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{29CB6A23-8891-485F-B398-1D4A01F1F008}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

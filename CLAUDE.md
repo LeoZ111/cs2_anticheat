@@ -29,5 +29,6 @@ später Valve zu zeigen.
 
 ## Prüfen
 - Python: `cd tracker && python -m pytest`. Tests, die eine offene `TODO(leo)`-Aufgabe prüfen, dürfen fehlschlagen.
-- C#: `cd plugin && dotnet test` (braucht das .NET 8 SDK).
+- C#: `cd plugin && dotnet test` (braucht das .NET 10 SDK). Auf den Testserver: `.\deploy.ps1`.
+- Testserver liegt getrennt vom Spiel in `D:\cs2server`. Nie Metamod oder Plugins in Leos normale CS2-Installation.
 - Nichts behaupten, was nicht gebaut oder getestet wurde. Im Spiel testen kann nur Leo.

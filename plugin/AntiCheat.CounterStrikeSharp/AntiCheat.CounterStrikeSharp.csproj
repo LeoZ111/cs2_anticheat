@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <!-- CounterStrikeSharp looks for plugins/<Name>/<Name>.dll -->
+    <AssemblyName>AntiCheat</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- The server already ships this DLL, so we only compile against it and do not copy it. -->
+    <PackageReference Include="CounterStrikeSharp.API" Version="1.0.377" ExcludeAssets="runtime" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AntiCheat.Core\AntiCheat.Core.csproj" />
+  </ItemGroup>
+
+</Project>

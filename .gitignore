@@ -6,6 +6,12 @@ __pycache__/
 venv/
 .pytest_cache/
 
+# C#
+bin/
+obj/
+*.user
+.vs/
+
 # Lokale Daten: nie committen (persönliche Daten, große Dateien)
 data/
 *.dem

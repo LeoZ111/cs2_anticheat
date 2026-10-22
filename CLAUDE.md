@@ -29,4 +29,5 @@ später Valve zu zeigen.
 
 ## Prüfen
 - Python: `cd tracker && python -m pytest`. Tests, die eine offene `TODO(leo)`-Aufgabe prüfen, dürfen fehlschlagen.
+- C#: `cd plugin && dotnet test` (braucht das .NET 8 SDK).
 - Nichts behaupten, was nicht gebaut oder getestet wurde. Im Spiel testen kann nur Leo.

@@ -24,6 +24,7 @@ public class AntiCheatPlugin : BasePlugin
 
         // Test-mode commands. Only for our own test server.
         BotSkillCommand.Register(this);
+        BotPositionsCommand.Register(this);
     }
 
     // A tiny line-of-sight check, so we see in the server console that the core runs there too.

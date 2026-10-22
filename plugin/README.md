@@ -45,9 +45,13 @@ Am Ende steht `Bestanden!` (oder `Passed!`) mit der Zahl der Tests.
 
 | Im Chat | Was passiert |
 | --- | --- |
-| `!enemy_skill noob` / `mid` / `hard` / `pro` / `legend` | Alle Bots werden neu eingesetzt, mit dieser Stärke |
+| `!bot_skill` | Menü mit allen Stufen im Chat, Auswahl mit `!1` bis `!5` |
+| `!bot_skill noob` / `mid` / `hard` / `pro` / `legend` | Bots werden nacheinander ersetzt, mit dieser Stärke |
 
-Mit `/` statt `!` sehen die anderen den Befehl nicht im Chat.
+Mit `/` statt `!` sehen die anderen den Befehl nicht im Chat. Die Bots werden im Abstand von einer halben Sekunde
+ersetzt. Alle auf einmal hat Spieler mit einem „Überlauf“-Fehler vom Server geworfen.
+
+Für Fehlersuche gibt es in der Server-Konsole `css_ac_bots`: zeigt Rundenstatus und die Positionen aller Bots.
 
 Die Stufen nutzen CS2s eigene Bot-Stärke (`bot_difficulty` 0 bis 3). **Legend** ist im Moment noch wie Pro. Besser als
 Pro wird es erst mit unserer eigenen Bot-Steuerung (Zielen, Bewegung, Reaktion auf Geräusche), die später kommt.

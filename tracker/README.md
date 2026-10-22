@@ -8,7 +8,7 @@ Er entsteht in kleinen Aufgaben. Jede Aufgabe ist ein echtes Stück des Trackers
 | Aufgabe | Was | Status |
 | --- | --- | --- |
 | 1 | Steam-IDs aus einer Datei lesen | fertig (Lösung von Claude) |
-| 2 | Bann-Status über die Steam-API abfragen | kommt |
+| 2 | Bann-Status über die Steam-API abfragen | fertig (Lösung von Claude) |
 | 3 | Ergebnisse in einer kleinen Datenbank speichern | kommt |
 | 4 | Täglicher Abgleich und Bericht | kommt |
 
@@ -100,3 +100,80 @@ Ein leerer Text `""` zählt in einem `if` als falsch. `if text:` ist also nur wa
 </details>
 
 Wenn du fertig bist: Erklär in 3–5 Sätzen in eigenen Worten, was deine Funktion macht. Das kommt in den Pull Request.
+
+
+## Aufgabe 2: Bann-Status über die Steam-API abfragen
+
+**Datei:** `tracker/steam_api.py`, Funktionen `parse_bans` (2a) und `is_banned` (2b)
+
+Eine **API** ist eine Art Briefkasten für Programme: Unser Programm schickt Steam eine Anfrage („Sind diese Spieler
+gebannt?“), und Steam antwortet mit Daten im Format **JSON**. In Python wird daraus ein `dict` mit Listen darin.
+
+Das Abschicken der Anfrage ist schon fertig (von Claude): `get_api_key`, `build_bans_url`, `fetch_bans_response` und
+`fetch_bans`. Deine Aufgabe ist das **Auswerten der Antwort**.
+
+Die Tests brauchen **kein Internet und keinen API-Schlüssel**. Sie benutzen eine ausgedachte Antwort (`FAKE_RESPONSE`
+in `tests/test_steam_api.py`), die genauso aufgebaut ist wie die echte. So eine nachgebaute Antwort nennt man **Mock**.
+
+### 2a: `parse_bans(response)`
+
+Steam antwortet mit vielen Feldern und Namen wie `NumberOfVACBans`. Wir wollen nur vier davon, mit einfachen Namen.
+Deine Funktion soll:
+
+1. die Liste unter `response["players"]` durchgehen,
+2. für jeden Spieler ein neues `dict` bauen mit den Schlüsseln `steam_id`, `vac_bans`, `game_bans` und
+   `days_since_last_ban` (die Werte kommen aus `SteamId`, `NumberOfVACBans`, `NumberOfGameBans`, `DaysSinceLastBan`),
+3. alle diese `dict`s als Liste zurückgeben.
+
+### 2b: `is_banned(player)`
+
+Bekommt ein `dict`, wie es `parse_bans` baut. Gibt `True` zurück, wenn der Spieler mindestens einen VAC-Bann **oder**
+mindestens einen Game-Bann hat, sonst `False`.
+
+**Fertig bist du, wenn `python -m pytest` nur grüne Tests zeigt.**
+
+### Hinweise (nur lesen, wenn du feststeckst)
+
+<details>
+<summary>Hinweis 1: An einen Wert im dict kommen</summary>
+
+`response["players"]` gibt dir die Liste der Spieler. Jeder Spieler ist wieder ein `dict`, also z. B.
+`player["SteamId"]`.
+
+</details>
+
+<details>
+<summary>Hinweis 2: Ein neues dict bauen</summary>
+
+Ein `dict` schreibst du mit geschweiften Klammern: `{"name": wert, "anderer_name": anderer_wert}`.
+Den Aufbau mit Liste und `.append(...)` kennst du schon aus Aufgabe 1.
+
+</details>
+
+<details>
+<summary>Hinweis 3: „oder“ in Python</summary>
+
+`a > 0 or b > 0` ist `True`, wenn mindestens eins von beiden stimmt. So ein Vergleich ist schon selbst `True` oder
+`False`, du kannst ihn direkt mit `return` zurückgeben.
+
+</details>
+
+### Mit echtem Schlüssel ausprobieren
+
+1. Schlüssel holen auf steamcommunity.com/dev/apikey (bei „Domain“ reicht z. B. `localhost`). **Nie in eine Datei im
+   Repo schreiben und nie teilen**, auch nicht mit Claude.
+2. Einmalig speichern (PowerShell). Der Befehl fragt nach dem Schlüssel, so landet er nicht im Befehlsverlauf:
+
+   ```
+   [Environment]::SetEnvironmentVariable("STEAM_API_KEY", (Read-Host "Steam API Key"), "User")
+   ```
+
+   Danach ein **neues** Terminal öffnen, erst dort ist der Schlüssel da.
+3. Eine Datei `data/ids.txt` anlegen, eine Steam-ID pro Zeile. Der Ordner `data/` wird nie committet.
+4. Im Ordner `tracker`:
+
+   ```
+   python -m tracker data/ids.txt
+   ```
+
+   Ausgabe: wie viele Spieler geprüft wurden, wie viele gebannt sind, und die gebannten IDs.

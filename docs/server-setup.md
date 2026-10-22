@@ -59,6 +59,34 @@ D:\cs2server\
    connect 127.0.0.1:27015
    ```
 
+## Bessere Bots: CS2-Bot-Improver (nur Teile davon)
+
+Für bessere Bots und die Stufe `legend` nutzen wir Teile von
+[CS2-Bot-Improver](https://github.com/ed0ard/CS2-Bot-Improver) (Version 1.4.6, Lizenz AGPL-3.0).
+**Kein Code davon kommt in dieses Repository.** Unser Plugin schickt nur Befehle wie `bot_add_ct "ZywOo"`.
+
+Eingebaut aus `CS2BotImprover_rules_unchanged.zip` (Sicherung vorher in `D:\cs2server\backups\before-botimprover`):
+
+| Teil | Wohin |
+| --- | --- |
+| BotController, BotVision (Metamod-Plugins) | `addons/BotController`, `addons/BotVision` + ihre `.vdf` in `addons/metamod` |
+| BotAI, BotBuy, BotControllerImpl, BotState, NadeSystem | `addons/counterstrikesharp/plugins/...` |
+| 0Harmony, BotControllerApi | `addons/counterstrikesharp/shared/...` |
+| Granaten-Daten | `addons/counterstrikesharp/data/NadeSystem` |
+| Pro-Bot-Profile | `overrides/botprofile.vpk` |
+
+In `gameinfo.gi` steht dafür **vor** der Metamod-Zeile:
+```
+Game    csgo/overrides/botprofile.vpk
+```
+
+**Bewusst nicht eingebaut:**
+- das mitgelieferte Metamod und CounterStrikeSharp (älter als unseres)
+- BotAimImprover: Sein „Kopfschuss-Zielen“ schaltet `mp_damage_headshot_only` für **alle** Spieler um.
+- BotRandomizer und BotHider (Skins und Profile für Bots, brauchen wir nicht)
+- gameinfo.gi, Spielregel-Dateien und das Panel-Programm
+- **Nie im normalen Spiel installieren.** Dort könnte VAC anspringen.
+
 ## Plugin neu aufspielen
 
 Im Ordner `plugin` des Repos: `.\deploy.ps1`. Danach im Server-Fenster `css_plugins reload AntiCheat` oder den

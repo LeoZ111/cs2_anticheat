@@ -54,9 +54,9 @@ public static class BotSkillCommand
         {
             BotSkillLevel chosen = level;
             string label = level.ToString().ToLowerInvariant();
-            if (BotSkill.SettingsFor(level).UsesOwnBotControl)
+            if (BotSkill.SettingsFor(level).UsesProTeam)
             {
-                label += " (vorerst wie pro)";
+                label += " (Gegner: Pro-Team)";
             }
             menu.AddMenuOption(label, (_, _) => Apply(plugin, chosen));
         }
@@ -66,19 +66,64 @@ public static class BotSkillCommand
     private static void Apply(BasePlugin plugin, BotSkillLevel level)
     {
         BotSkillSettings settings = BotSkill.SettingsFor(level);
-        string name = level.ToString().ToUpperInvariant();
-        string note = settings.UsesOwnBotControl ? " (vorerst wie PRO, eigene Bot-Steuerung kommt noch)" : "";
-        Server.PrintToChatAll($" {ChatColors.Green}[AntiCheat]{ChatColors.Default} Bot-Stärke: {ChatColors.Gold}{name}{ChatColors.Default}{note}. Bots werden nacheinander ersetzt.");
-
-        // bot_difficulty only applies to newly added bots. We kick the bots one by one;
-        // bot_quota fills the free slots again with bots of the new difficulty.
         Server.ExecuteCommand($"bot_difficulty {settings.BotDifficulty}");
-        var botUserIds = Utilities.GetPlayers().Where(p => p.IsBot && p.UserId.HasValue).Select(p => p.UserId!.Value).ToList();
-        for (int i = 0; i < botUserIds.Count; i++)
+        var bots = Utilities.GetPlayers().Where(p => p.IsBot && p.UserId.HasValue).ToList();
+
+        if (settings.UsesProTeam)
         {
-            int userId = botUserIds[i];
+            BringInProTeam(plugin, bots);
+            return;
+        }
+
+        string name = level.ToString().ToUpperInvariant();
+        Server.PrintToChatAll($" {ChatColors.Green}[AntiCheat]{ChatColors.Default} Bot-Stärke: {ChatColors.Gold}{name}{ChatColors.Default}. Bots werden nacheinander ersetzt.");
+
+        // bot_difficulty only applies to newly added bots. kickid keeps bot_quota as it is,
+        // so the server fills each free slot again with a bot of the new difficulty.
+        for (int i = 0; i < bots.Count; i++)
+        {
+            int userId = bots[i].UserId!.Value;
             plugin.AddTimer(i * SecondsBetweenBots, () => Server.ExecuteCommand($"kickid {userId}"));
         }
-        plugin.Logger.LogInformation("bot_difficulty {Difficulty}, replacing {Count} bots", settings.BotDifficulty, botUserIds.Count);
+        plugin.Logger.LogInformation("bot_difficulty {Difficulty}, replacing {Count} bots", settings.BotDifficulty, bots.Count);
+    }
+
+    // Legend: the enemy bots are replaced by bot profiles of a real pro team.
+    private static void BringInProTeam(BasePlugin plugin, List<CCSPlayerController> bots)
+    {
+        var humanTeams = Utilities.GetPlayers().Where(p => !p.IsBot && !p.IsHLTV).Select(p => (int)p.TeamNum);
+        int enemySide = ProTeams.EnemySideOf(humanTeams);
+        string side = enemySide == ProTeams.Terrorists ? "t" : "ct";
+        ProTeam team = ProTeams.Pick(Random.Shared);
+        var enemyBotIds = bots.Where(b => b.TeamNum == enemySide).Select(b => b.UserId!.Value).ToList();
+
+        Server.PrintToChatAll($" {ChatColors.Green}[AntiCheat]{ChatColors.Default} Bot-Stärke: {ChatColors.Gold}LEGEND{ChatColors.Default}. Gegner: {ChatColors.Gold}{team.Name}{ChatColors.Default} ({string.Join(", ", team.Players)})");
+
+        // bot_kick lowers bot_quota and bot_add raises it again, so the quota does not fill in random bots in between.
+        int steps = Math.Max(enemyBotIds.Count, team.Players.Count);
+        for (int i = 0; i < steps; i++)
+        {
+            float time = i * SecondsBetweenBots;
+            if (i < enemyBotIds.Count)
+            {
+                int userId = enemyBotIds[i];
+                plugin.AddTimer(time, () => KickBotLoweringQuota(userId));
+            }
+            if (i < team.Players.Count)
+            {
+                string pro = team.Players[i];
+                plugin.AddTimer(time + SecondsBetweenBots / 2, () => Server.ExecuteCommand($"bot_add_{side} \"{pro}\""));
+            }
+        }
+        plugin.Logger.LogInformation("legend: {Team} on {Side}, replacing {Count} enemy bots", team.Name, side, enemyBotIds.Count);
+    }
+
+    private static void KickBotLoweringQuota(int userId)
+    {
+        var bot = Utilities.GetPlayerFromUserid(userId);
+        if (bot is { IsValid: true, IsBot: true })
+        {
+            Server.ExecuteCommand($"bot_kick \"{bot.PlayerName}\"");
+        }
     }
 }

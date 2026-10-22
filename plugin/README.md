@@ -53,9 +53,9 @@ ersetzt. Alle auf einmal hat Spieler mit einem „Überlauf“-Fehler vom Server
 
 Für Fehlersuche gibt es in der Server-Konsole `css_ac_bots`: zeigt Rundenstatus und die Positionen aller Bots.
 
-Die Stufen nutzen CS2s eigene Bot-Stärke (`bot_difficulty` 0 bis 3). **Legend** ist im Moment noch wie Pro. Besser als
-Pro wird es erst mit unserer eigenen Bot-Steuerung (Zielen, Bewegung, Reaktion auf Geräusche), die später kommt.
-`bot_difficulty` gilt für alle Bots, also auch für die im eigenen Team.
+noob bis pro nutzen CS2s eigene Bot-Stärke (`bot_difficulty` 0 bis 3, gilt für alle Bots). **Legend** ersetzt die
+Gegner-Bots durch Bot-Profile eines echten Pro-Teams (zufällig: Vitality, Spirit, Falcons, FURIA oder NAVI). Das
+braucht die Bot-Plugins von CS2-Bot-Improver auf dem Testserver, siehe `docs/server-setup.md`.
 
 ## Was schon da ist: Sichtlinien
 

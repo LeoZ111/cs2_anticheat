@@ -34,10 +34,10 @@ public class BotSkillTests
     }
 
     [Fact]
-    public void OnlyLegendUsesOwnBotControl()
+    public void OnlyLegendUsesAProTeam()
     {
-        Assert.True(BotSkill.SettingsFor(BotSkillLevel.Legend).UsesOwnBotControl);
-        Assert.False(BotSkill.SettingsFor(BotSkillLevel.Pro).UsesOwnBotControl);
+        Assert.True(BotSkill.SettingsFor(BotSkillLevel.Legend).UsesProTeam);
+        Assert.False(BotSkill.SettingsFor(BotSkillLevel.Pro).UsesProTeam);
     }
 
     [Fact]

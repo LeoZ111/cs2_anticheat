@@ -12,8 +12,8 @@ public enum BotSkillLevel
 
 /// <summary>What the server has to set for one skill level.</summary>
 /// <param name="BotDifficulty">CS2's own bot_difficulty: 0 easy, 1 normal, 2 hard, 3 expert.</param>
-/// <param name="UsesOwnBotControl">True once our own bot steering (aim, movement, sounds) takes over.</param>
-public readonly record struct BotSkillSettings(int BotDifficulty, bool UsesOwnBotControl);
+/// <param name="UsesProTeam">True if the enemy bots are replaced by a pro team (see <see cref="ProTeams"/>).</param>
+public readonly record struct BotSkillSettings(int BotDifficulty, bool UsesProTeam);
 
 public static class BotSkill
 {
@@ -39,7 +39,7 @@ public static class BotSkill
             BotSkillLevel.Mid => new BotSkillSettings(1, false),
             BotSkillLevel.Hard => new BotSkillSettings(2, false),
             BotSkillLevel.Pro => new BotSkillSettings(3, false),
-            // CS2 has no level above expert. Legend gets better than Pro with our own bot steering (later).
+            // CS2 has no level above expert. Legend plays against bot profiles of real pros instead.
             BotSkillLevel.Legend => new BotSkillSettings(3, true),
             _ => throw new ArgumentOutOfRangeException(nameof(level)),
         };

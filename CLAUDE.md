@@ -14,8 +14,10 @@ später Valve zu zeigen.
 - Nie direkt auf `main` pushen. Alles über Pull Requests, Leo mergt. Ausnahme war nur der erste Commit (leeres Repository).
 - Kleine Pull Requests, höchstens ein paar hundert Zeilen. Jeder PR hat eine Erklärung auf Deutsch: was, warum,
   wie man es testet. Bei wichtigen Teilen 2–3 Verständnisfragen an Leo.
-- **Leo-Aufgaben** sind mit `TODO(leo)` markiert. Dafür schreibt Claude Tests und Erklärungen, aber **nie die Lösung**.
-  Steckt Leo fest: Hinweise geben, Schritt für Schritt, nicht den fertigen Code.
+- **Leo-Aufgaben** sind mit `TODO(leo)` markiert. Dafür schreibt Claude Tests und Erklärungen, die Lösung nur, wenn
+  Leo ausdrücklich darum bittet. Steckt Leo fest: zuerst Hinweise geben, Schritt für Schritt.
+- Schreibt Claude eine Leo-Aufgabe, steht das ehrlich im PR („Lösung von Claude“), mit einer einfachen Erklärung
+  jeder Zeile. Leo liest den Code und kann ihn erklären, bevor er mergt.
 - Leos Rolle wächst mit: Python-Teile (Tracker, Auswertung, später KI) sind seine, das C#-Plugin schreibt zuerst Claude.
 
 ## Sicherheit und Daten

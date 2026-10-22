@@ -14,5 +14,10 @@ def load_steam_ids(filename: str) -> list[str]:
 
     gives: ["76561197960287930", "76561198000000001"]
     """
-    # TODO(leo): Aufgabe 1, siehe tracker/README.md
-    raise NotImplementedError("Aufgabe 1: siehe tracker/README.md")
+    steam_ids = []
+    with open(filename) as file:
+        for line in file:
+            steam_id = line.strip()
+            if steam_id:
+                steam_ids.append(steam_id)
+    return steam_ids

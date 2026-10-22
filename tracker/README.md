@@ -7,7 +7,7 @@ Er entsteht in kleinen Aufgaben. Jede Aufgabe ist ein echtes Stück des Trackers
 
 | Aufgabe | Was | Status |
 | --- | --- | --- |
-| 1 | Steam-IDs aus einer Datei lesen | offen |
+| 1 | Steam-IDs aus einer Datei lesen | fertig (Lösung von Claude) |
 | 2 | Bann-Status über die Steam-API abfragen | kommt |
 | 3 | Ergebnisse in einer kleinen Datenbank speichern | kommt |
 | 4 | Täglicher Abgleich und Bericht | kommt |

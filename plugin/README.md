@@ -41,6 +41,18 @@ dotnet test
 
 Am Ende steht `Bestanden!` (oder `Passed!`) mit der Zahl der Tests.
 
+## Testmodus-Befehle (nur Testserver)
+
+| Im Chat | Was passiert |
+| --- | --- |
+| `!enemy_skill noob` / `mid` / `hard` / `pro` / `legend` | Alle Bots werden neu eingesetzt, mit dieser Stärke |
+
+Mit `/` statt `!` sehen die anderen den Befehl nicht im Chat.
+
+Die Stufen nutzen CS2s eigene Bot-Stärke (`bot_difficulty` 0 bis 3). **Legend** ist im Moment noch wie Pro. Besser als
+Pro wird es erst mit unserer eigenen Bot-Steuerung (Zielen, Bewegung, Reaktion auf Geräusche), die später kommt.
+`bot_difficulty` gilt für alle Bots, also auch für die im eigenen Team.
+
 ## Was schon da ist: Sichtlinien
 
 Der Fog muss für jeden Spieler wissen: **Kann ich diesen Gegner sehen, oder ist eine Wand dazwischen?**

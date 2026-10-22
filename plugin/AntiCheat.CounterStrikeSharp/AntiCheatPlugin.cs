@@ -1,5 +1,6 @@
 using System.Numerics;
 using AntiCheat.Core.Geometry;
+using AntiCheat.CounterStrikeSharp.TestMode;
 using CounterStrikeSharp.API.Core;
 using Microsoft.Extensions.Logging;
 
@@ -20,6 +21,9 @@ public class AntiCheatPlugin : BasePlugin
     {
         // Logger writes to the server console and to addons/counterstrikesharp/logs.
         Logger.LogInformation("Hallo! Plugin geladen. Kern-Selbsttest: {Result}", CoreSelfTest() ? "OK" : "FEHLER");
+
+        // Test-mode commands. Only for our own test server.
+        BotSkillCommand.Register(this);
     }
 
     // A tiny line-of-sight check, so we see in the server console that the core runs there too.

@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+
+# Lokale Daten: nie committen (persönliche Daten, große Dateien)
+data/
+*.dem
+*.db
+*.sqlite
+
+# Geheimnisse
+.env
+
+# Editor / System
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

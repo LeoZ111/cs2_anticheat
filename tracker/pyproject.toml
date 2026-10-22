@@ -1,0 +1,12 @@
+[project]
+name = "cs2-ban-tracker"
+version = "0.1.0"
+description = "Tracks which players from our CS2 matches get banned by Valve, and when."
+requires-python = ">=3.10"
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

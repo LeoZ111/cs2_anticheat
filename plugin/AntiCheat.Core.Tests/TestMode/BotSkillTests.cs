@@ -11,6 +11,7 @@ public class BotSkillTests
     [InlineData("pro", BotSkillLevel.Pro)]
     [InlineData("legend", BotSkillLevel.Legend)]
     [InlineData("  PRO ", BotSkillLevel.Pro)]
+    [InlineData("expert", BotSkillLevel.Pro)]
     public void KnownNamesAreRead(string text, BotSkillLevel expected)
     {
         Assert.Equal(expected, BotSkill.Parse(text));

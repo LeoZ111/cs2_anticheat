@@ -25,7 +25,7 @@ public static class BotSkill
             "noob" => BotSkillLevel.Noob,
             "mid" => BotSkillLevel.Mid,
             "hard" => BotSkillLevel.Hard,
-            "pro" => BotSkillLevel.Pro,
+            "pro" or "expert" => BotSkillLevel.Pro,
             "legend" => BotSkillLevel.Legend,
             _ => null,
         };

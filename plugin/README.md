@@ -50,6 +50,12 @@ Am Ende steht `Bestanden!` (oder `Passed!`) mit der Zahl der Tests.
 | `!bot_s pro` | Abkürzung: passt der Anfang zu genau einem Befehl, wird er ausgeführt |
 | `!bot_skill` | Menü mit allen Stufen im Chat, Auswahl mit `!1` bis `!5` |
 | `!bot_skill noob` / `mid` / `hard` / `pro` / `legend` | Bots werden nacheinander ersetzt, mit dieser Stärke |
+| `!map mirage` | Karte wechseln (`!map` allein zeigt alle Karten) |
+| `!money max` / `normal` / `5000` | Geld: max = 16000 und kaufen überall, normal = wie Competitive, oder ein Betrag |
+| `!warmup off` / `on` | Aufwärmphase beenden oder neu starten |
+| `!roundtime 1,5` | Rundenzeit in Minuten, ab der nächsten Runde |
+| `!nades off` / `less` / `normal` / `more` / `max` | Wie viele Granaten Bots werfen (NadeSystem) |
+| `!bot_weapon awp` / `normal` | Waffe aller Bots ab der nächsten Runde (`bot_loadout`) |
 
 Mit `/` statt `!` sehen die anderen den Befehl nicht im Chat.
 

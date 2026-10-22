@@ -1,4 +1,5 @@
 using AntiCheat.Core.TestMode;
+using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Utils;
@@ -50,7 +51,15 @@ public static class ChatHelp
         if (matches.Count == 1 && matches[0].Name != HelpName)
         {
             player.PrintToChat($" {ChatColors.Green}[AntiCheat]{ChatColors.Default} → !{matches[0].Name} {rest}");
-            player.ExecuteClientCommandFromServer($"css_{matches[0].Name} {rest}".TrimEnd());
+            // Run it on the next frame, not inside the chat hook, so we do not start a command while one is running.
+            string commandLine = $"css_{matches[0].Name} {rest}".TrimEnd();
+            Server.NextFrame(() =>
+            {
+                if (player.IsValid)
+                {
+                    player.ExecuteClientCommandFromServer(commandLine);
+                }
+            });
             return done;
         }
 

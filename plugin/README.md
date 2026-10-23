@@ -6,19 +6,30 @@ Hier entsteht das Fog-Plugin für den CS2-Server. Es ist in zwei Teile getrennt:
 | --- | --- | --- |
 | `AntiCheat.Core` | Der **Kern**: Geometrie, Sicht, später Fog und Köder | nein |
 | `AntiCheat.Core.Tests` | Tests für den Kern | nein |
-| `AntiCheat.CounterStrikeSharp` | Der **Adapter**: verbindet den Kern mit dem Server (kommt später) | ja |
+| `AntiCheat.CounterStrikeSharp` | Der **Adapter**: verbindet den Kern mit dem Server | ja |
 
 Warum getrennt? Siehe `docs/decisions/0003-plugin-core.md`.
 
 ## Einrichten (einmalig)
 
-Du brauchst das **.NET 8 SDK** (ist auf Leos PC schon installiert). Prüfen:
+Du brauchst das **.NET 10 SDK** (ist auf Leos PC schon installiert). CounterStrikeSharp verlangt .NET 10. Prüfen:
 
 ```
 dotnet --list-sdks
 ```
 
-Dort muss eine Zeile mit `8.0.` stehen.
+Dort muss eine Zeile mit `10.0.` stehen.
+
+## Plugin auf den Testserver bringen
+
+Im Ordner `plugin`:
+
+```
+.\deploy.ps1
+```
+
+Das baut das Plugin und kopiert es nach `D:\cs2server\cs2\game\csgo\addons\counterstrikesharp\plugins\AntiCheat`.
+Wie der Server eingerichtet und gestartet wird, steht in `docs/server-setup.md`.
 
 ## Tests laufen lassen
 

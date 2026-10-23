@@ -20,7 +20,7 @@ Ehrliche Spieler sollen vom System nichts merken. Netzwerk- oder Leistungsproble
 | --- | --- | --- |
 | `tracker/` | Bann-Tracker | Python |
 | `docs/` | Architektur und Entscheidungen | Deutsch |
-| `plugin/` | Fog-Plugin für CounterStrikeSharp (kommt später) | C# |
+| `plugin/` | Fog-Plugin: Kern (Geometrie, Sicht) und später der Server-Adapter | C# |
 
 ## Regeln
 

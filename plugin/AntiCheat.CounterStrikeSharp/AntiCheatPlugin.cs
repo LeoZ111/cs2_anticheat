@@ -1,6 +1,7 @@
 using System.Numerics;
 using AntiCheat.Core.Geometry;
 using AntiCheat.Core.TestMode;
+using AntiCheat.CounterStrikeSharp.Fog;
 using AntiCheat.CounterStrikeSharp.TestMode;
 using AntiCheat.CounterStrikeSharp.TestMode.Cheats;
 using CounterStrikeSharp.API.Core;
@@ -23,12 +24,21 @@ public class AntiCheatPlugin : BasePlugin
     // Simulated cheats only work while this is 1. Set it in the test server's config, never on a real server.
     public FakeConVar<bool> TestMode = new("ac_testmode", "Enables test-mode features like simulated cheats", false);
 
+    // Fog of war. Off by default until it is tested well.
+    public FakeConVar<bool> FogEnabled = new("ac_fog", "Fog of war: do not send enemies a player cannot see or hear", false);
+
     private CheatsModule? _cheats;
+    private FogModule? _fog;
 
     public override void Load(bool hotReload)
     {
         // Logger writes to the server console and to addons/counterstrikesharp/logs.
         Logger.LogInformation("Hallo! Plugin geladen. Kern-Selbsttest: {Result}", CoreSelfTest() ? "OK" : "FEHLER");
+
+        // The fog must register before the cheats: its CheckTransmit runs first, so the simulated cheats
+        // only see what the fog lets through, like real cheats.
+        _fog = new FogModule(this, () => FogEnabled.Value, on => FogEnabled.Value = on, () => TestMode.Value);
+        _fog.Register();
 
         // Test-mode commands. Only for our own test server.
         BotSkillCommand.Register(this);
@@ -41,6 +51,7 @@ public class AntiCheatPlugin : BasePlugin
         ChatHelp.Register(this, SettingsCommands.Infos
             .Append(new ChatCommandInfo("bot_skill", "[" + string.Join("|", BotSkill.AllNames.Split(", ")) + "]", "Bot-Stärke einstellen (ohne Angabe: Menü)"))
             .Append(CheatsModule.Info)
+            .Append(FogModule.Info)
             .ToList());
     }
 

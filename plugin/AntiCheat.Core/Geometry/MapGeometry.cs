@@ -25,6 +25,12 @@ public sealed class MapGeometry
         TriangleLayers = triangleLayers;
     }
 
+    /// <summary>
+    /// Layers that block sight. Not: invisible walls for players/NPCs/grenades, and things bullets pass through.
+    /// </summary>
+    public static bool BlocksSight(string layer) =>
+        !layer.Contains("playerclip") && !layer.Contains("npcclip") && !layer.Contains("grenadeclip") && !layer.Contains("passbullets");
+
     /// <summary>Only the triangles whose layer passes the filter, e.g. everything that blocks sight.</summary>
     public IReadOnlyList<Triangle> Where(Func<string, bool> keepLayer)
     {

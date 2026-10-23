@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.Numerics;
 using AntiCheat.Core.Geometry;
@@ -11,16 +11,12 @@ namespace AntiCheat.MapTool;
 /// </summary>
 public static class Check
 {
-    // Layers that do not block sight: invisible walls for players/NPCs/grenades, and things bullets pass through.
-    public static bool BlocksSight(string layer) =>
-        !layer.Contains("playerclip") && !layer.Contains("npcclip") && !layer.Contains("grenadeclip") && !layer.Contains("passbullets");
-
     public static int Run(string mapFile, string? pairsCsv)
     {
         var watch = Stopwatch.StartNew();
         MapGeometry geometry;
         using (var stream = File.OpenRead(mapFile)) geometry = MapGeometry.Read(stream);
-        var sight = geometry.Where(BlocksSight);
+        var sight = geometry.Where(MapGeometry.BlocksSight);
         Console.WriteLine($"loaded {geometry.Triangles.Count} triangles ({sight.Count} block sight) in {watch.ElapsedMilliseconds} ms");
 
         watch.Restart();
@@ -50,7 +46,7 @@ public static class Check
         int blocked = 0;
         foreach (var s in segments) if (bvh.IsBlocked(s)) blocked++;
         double micro = watch.Elapsed.TotalMilliseconds * 1000 / segments.Length;
-        Console.WriteLine($"{segments.Length} random sight lines: {micro:F2} µs each ({blocked * 100 / segments.Length} % blocked)");
+        Console.WriteLine($"{segments.Length} random sight lines: {micro:F2} Âµs each ({blocked * 100 / segments.Length} % blocked)");
         Console.WriteLine($"  per tick budget 0.5 ms = about {(int)(500 / micro)} sight lines");
     }
 

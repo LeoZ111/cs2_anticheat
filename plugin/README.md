@@ -86,6 +86,39 @@ noob bis pro nutzen CS2s eigene Bot-Stärke (`bot_difficulty` 0 bis 3, gilt für
 Gegner-Bots durch Bot-Profile eines echten Pro-Teams (zufällig: Vitality, Spirit, Falcons, FURIA oder NAVI). Das
 braucht die Bot-Plugins von CS2-Bot-Improver auf dem Testserver, siehe `docs/server-setup.md`.
 
+## Fog of War (Version 1)
+
+Der Server schickt jedem Spieler nur Gegner, die er **sehen oder hören** kann. Alle anderen fehlen in seinem Spiel
+komplett, also kann auch kein Wallhack sie anzeigen.
+
+- **Kern:** `AntiCheat.Core/Fog/FogSystem.cs` (mit Tests). Pro Tick und pro Paar (Spieler, Gegner) gilt:
+  - Teammates, Tote, Zuschauer: immer senden
+  - näher als 160 Einheiten: senden
+  - **sichtbar**: Sichtlinie von den Augen zu einem von 5 Punkten (Kopf, Brust, Füße, beide Schultern) ist frei.
+    Das gilt auch für die **vorhergesagte** Position nach Ping + 0,1 s, gegen das „Aufploppen“ um Ecken.
+  - **gerade noch gesehen**: noch 8 Ticks weiter senden, gegen Flackern
+  - **hörbar**: rennt (schneller als 135) und näher als 1.100, oder hat geschossen (1 s lang, bis 2.500)
+  - sonst: **nicht senden**
+- **Plugin:** `AntiCheat.CounterStrikeSharp/Fog/FogModule.cs` entfernt versteckte Gegner (und ihre Waffen) aus dem,
+  was der Server an jeden Spieler schickt (`CheckTransmit`).
+- **Wände:** `plugins/AntiCheat/maps/<karte>.actri`. `deploy.ps1` erzeugt sie für alle 11 Karten automatisch
+  (nach einem CS2-Update: `.\deploy.ps1 -RebuildMaps`).
+
+| Befehl | Was |
+| --- | --- |
+| `!fog` / `!fog on` / `!fog off` | Fog an/aus (nur Testmodus) |
+| `ac_fog 1` | dasselbe in der Server-Konsole oder Config |
+| `css_fog_stats` (Konsole) | Rechenzeit pro Tick, Sichtlinien pro Tick, Anteil versteckter Gegner |
+
+**Gemessen auf Dust2 mit 10 Bots:** 0,35 ms pro Tick im Schnitt, 532 Sichtlinien pro Tick, 92 % der Gegner-Paare
+versteckt.
+
+**Zusammen mit `!cheat esp`:** Der Fog registriert sich vor den Cheats. Die simulierten Cheats sehen also nur, was
+der Fog durchlässt, genau wie echte Cheats.
+
+**Noch nicht:** Rauch blockiert noch keine Sicht. Geräusche werden nur grob behandelt (das Leck wird später gemessen).
+Fenster und dünne Gitter zählen als Wand, wenn sie in der Kollision so stehen.
+
 ## Karten-Werkzeug
 
 `AntiCheat.MapTool` liest die **Kollisions-Geometrie** einer CS2-Karte (`maps/<karte>.vpk` →

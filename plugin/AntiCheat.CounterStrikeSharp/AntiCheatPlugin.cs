@@ -1,6 +1,10 @@
 using System.Numerics;
 using AntiCheat.Core.Geometry;
+using AntiCheat.Core.TestMode;
+using AntiCheat.CounterStrikeSharp.TestMode;
+using AntiCheat.CounterStrikeSharp.TestMode.Cheats;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Cvars;
 using Microsoft.Extensions.Logging;
 
 namespace AntiCheat.CounterStrikeSharp;
@@ -16,10 +20,33 @@ public class AntiCheatPlugin : BasePlugin
     public override string ModuleAuthor => "LeoZ111";
     public override string ModuleDescription => "Server-side anti-cheat (fog of war, decoys)";
 
+    // Simulated cheats only work while this is 1. Set it in the test server's config, never on a real server.
+    public FakeConVar<bool> TestMode = new("ac_testmode", "Enables test-mode features like simulated cheats", false);
+
+    private CheatsModule? _cheats;
+
     public override void Load(bool hotReload)
     {
         // Logger writes to the server console and to addons/counterstrikesharp/logs.
         Logger.LogInformation("Hallo! Plugin geladen. Kern-Selbsttest: {Result}", CoreSelfTest() ? "OK" : "FEHLER");
+
+        // Test-mode commands. Only for our own test server.
+        BotSkillCommand.Register(this);
+        BotPositionsCommand.Register(this);
+        SettingsCommands.Register(this);
+        _cheats = new CheatsModule(this, () => TestMode.Value);
+        _cheats.Register();
+
+        // Every chat command must be listed here, so "!" and "!<beginning>" can show it.
+        ChatHelp.Register(this, SettingsCommands.Infos
+            .Append(new ChatCommandInfo("bot_skill", "[" + string.Join("|", BotSkill.AllNames.Split(", ")) + "]", "Bot-Stärke einstellen (ohne Angabe: Menü)"))
+            .Append(CheatsModule.Info)
+            .ToList());
+    }
+
+    public override void Unload(bool hotReload)
+    {
+        _cheats?.Unload();
     }
 
     // A tiny line-of-sight check, so we see in the server console that the core runs there too.

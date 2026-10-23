@@ -19,6 +19,8 @@ sucht der Detektor nach Dingen, die für Menschen unmöglich sind:
 Jedes Merkmal hat Tests mit erfundenen Daten, bei denen das Ergebnis bekannt ist (z. B. ein simulierter Aimbot, der zum
 Gegner zieht).
 
+> **Nachtrag:** Auf 200 Matches sind die Werte deutlich schlechter, siehe [0004](0004-detektor-200-matches.md).
+
 ## Ergebnis auf echten Daten
 
 Trennschärfe: 0,5 = Münzwurf, 1,0 = perfekt.

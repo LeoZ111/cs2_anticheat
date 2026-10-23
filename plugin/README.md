@@ -59,6 +59,22 @@ Am Ende steht `Bestanden!` (oder `Passed!`) mit der Zahl der Tests.
 
 Mit `/` statt `!` sehen die anderen den Befehl nicht im Chat.
 
+### Simulierte Cheats (nur mit `ac_testmode 1`)
+
+| Im Chat | Was passiert |
+| --- | --- |
+| `!cheat` | Liste aller Cheats und ob sie an sind |
+| `!cheat radar` | Radar-Hack: alle Gegner auf deinem Radar |
+| `!cheat esp` | ESP/Wallhack: Gegner leuchten durch Wände, nur für dich |
+| `!cheat aim_legit` | Aimbot legit: zieht sanft zum Kopf, nur nahe am Fadenkreuz (12°) |
+| `!cheat aim_rage` | Aimbot rage: schnappt sofort auf jeden Kopf |
+| `!cheat speed` | Speedhack: 50 % schneller |
+| `!cheat bhop` | Bunnyhop (gilt für alle auf dem Server, weil CS2 das nur für alle kann) |
+
+`!cheat esp` schaltet um, `!cheat esp on` / `off` schaltet fest. Alles läuft auf dem Server. Wie echte Cheats
+nutzen die Cheats nur Gegner, die der Server an dein Spiel schickt. Mit Fog werden sie also blind.
+**Noch nicht:** Der Aimbot prüft keine Wände (dafür braucht es die Karten-Geometrie), und schießen musst du selbst.
+
 Echtes Tab-Vervollständigen beim Tippen gibt es in CS2 nicht: Der Server sieht eine Nachricht erst nach Enter.
 Darum zeigt `!` + Anfang + Enter die passenden Befehle. **Jeder neue Chat-Befehl muss in `AntiCheatPlugin.cs` bei
 `ChatHelp.Register` eingetragen werden**, sonst taucht er in der Liste nicht auf. Die Bots werden im Abstand von einer halben Sekunde

@@ -9,7 +9,7 @@ Er entsteht in kleinen Aufgaben. Jede Aufgabe ist ein echtes Stück des Trackers
 | --- | --- | --- |
 | 1 | Steam-IDs aus einer Datei lesen | fertig (Lösung von Claude) |
 | 2 | Bann-Status über die Steam-API abfragen | fertig (Lösung von Claude) |
-| 3 | Ergebnisse in einer kleinen Datenbank speichern | kommt |
+| 3 | Ergebnisse in einer kleinen Datenbank speichern | offen |
 | 4 | Täglicher Abgleich und Bericht | kommt |
 
 ## Einrichten (einmalig)
@@ -177,3 +177,66 @@ Den Aufbau mit Liste und `.append(...)` kennst du schon aus Aufgabe 1.
    ```
 
    Ausgabe: wie viele Spieler geprüft wurden, wie viele gebannt sind, und die gebannten IDs.
+## Aufgabe 3: Ergebnisse in einer kleinen Datenbank speichern
+
+**Datei:** `tracker/database.py`, Funktionen `save_check` (3a) und `get_checks` (3b)
+
+Eine **Datenbank** ist wie eine Tabelle in Excel, nur für Programme. Wir nehmen **SQLite**: Die ganze Datenbank ist
+eine einzige Datei (z. B. `data/bans.db`), und SQLite ist schon in Python eingebaut (`import sqlite3`).
+
+Mit der Datenbank redet man in der Sprache **SQL**. Du brauchst nur zwei Befehle:
+
+- `INSERT`: eine neue Zeile hinzufügen
+- `SELECT`: Zeilen lesen
+
+Unsere Tabelle heißt `ban_checks`. Jede Zeile ist **eine Abfrage für einen Spieler an einem Tag**:
+
+| steam_id | checked_at | vac_bans | game_bans | days_since_last_ban |
+| --- | --- | --- | --- | --- |
+| 76561198000000001 | 2026-10-22 | 0 | 0 | 0 |
+| 76561198000000001 | 2026-10-23 | 1 | 0 | 0 |
+
+Hier sieht man: Am 23.10. ist ein VAC-Bann aufgetaucht. Warum wir jede Abfrage speichern und nicht nur den letzten
+Stand, steht in `docs/decisions/0002-ban-history.md`.
+
+Schon fertig (von Claude): `open_database` (öffnet die Datei und legt die Tabelle an) und `save_checks` (speichert eine
+ganze Liste und nimmt das heutige Datum).
+
+### 3a: `save_check(connection, player, checked_at)`
+
+Fügt **eine** Zeile in `ban_checks` ein. Die Werte kommen aus dem `dict` `player` (so wie es `parse_bans` baut) und aus
+`checked_at`. Die Spalte `id` füllt SQLite selbst.
+
+### 3b: `get_checks(connection, steam_id)`
+
+Liest alle Zeilen für **einen** Spieler, **älteste zuerst**, und gibt sie als Liste von `dict`s zurück, jedes mit
+`checked_at`, `vac_bans`, `game_bans` und `days_since_last_ban`.
+
+**Fertig bist du, wenn `python -m pytest` nur grüne Tests zeigt.**
+
+### Hinweise (nur lesen, wenn du feststeckst)
+
+<details>
+<summary>Hinweis 1: SQL aus Python schicken</summary>
+
+`connection.execute("SQL-Befehl", (wert1, wert2))` schickt einen Befehl. Jedes `?` im Befehl wird der Reihe nach durch
+einen Wert aus dem Tupel ersetzt. Ein Beispiel steht in `tests/test_database.py` in `insert_row`.
+
+</details>
+
+<details>
+<summary>Hinweis 2: Warum `?` und nicht die Werte direkt in den Text?</summary>
+
+Würde man Werte direkt in den SQL-Text kleben, könnte ein komischer Wert den Befehl verändern (das nennt man
+**SQL-Injection**). Mit `?` behandelt SQLite den Wert immer nur als Wert. Also: immer `?` benutzen.
+
+</details>
+
+<details>
+<summary>Hinweis 3: Zeilen lesen</summary>
+
+`SELECT spalte1, spalte2 FROM ban_checks WHERE steam_id = ? ORDER BY checked_at` wählt die Zeilen aus.
+`connection.execute(...).fetchall()` gibt dir eine Liste von Tupeln, z. B. `[("2026-10-22", 0, 0, 0)]`.
+Jedes Tupel kannst du in einer `for`-Schleife auspacken: `for checked_at, vac_bans, game_bans, days in rows:`
+
+</details>

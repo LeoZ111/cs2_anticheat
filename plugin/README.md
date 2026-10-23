@@ -86,6 +86,27 @@ noob bis pro nutzen CS2s eigene Bot-Stärke (`bot_difficulty` 0 bis 3, gilt für
 Gegner-Bots durch Bot-Profile eines echten Pro-Teams (zufällig: Vitality, Spirit, Falcons, FURIA oder NAVI). Das
 braucht die Bot-Plugins von CS2-Bot-Improver auf dem Testserver, siehe `docs/server-setup.md`.
 
+## Karten-Werkzeug
+
+`AntiCheat.MapTool` liest die **Kollisions-Geometrie** einer CS2-Karte (`maps/<karte>.vpk` →
+`world_physics.vmdl_c`) mit der Bibliothek [ValveResourceFormat](https://github.com/ValveResourceFormat/ValveResourceFormat)
+(MIT-Lizenz) und schreibt sie als Dreiecke in eine `.actri`-Datei (Format: `AntiCheat.Core/Geometry/MapGeometry.cs`).
+
+```
+dotnet run --project AntiCheat.MapTool -c Release -- D:\cs2server\cs2\game\csgo\maps\de_dust2.vpk ..\tracker\data\maps\de_dust2.actri
+dotnet run --project AntiCheat.MapTool -c Release -- check ..\tracker\data\maps\de_dust2.actri [paare.csv]
+```
+
+Die Karten-Dateien sind aus Valves Spieldaten erzeugt und kommen **nicht ins Repository** (`tracker/data/` wird ignoriert).
+
+Jedes Dreieck hat eine **Ebene**: `default` (normale Wände), `playerclip`/`npcclip` (unsichtbare Wände nur für Spieler),
+`csgo_grenadeclip`, `passbullets` (Kugeln fliegen durch), `sky`. Für **Sicht** zählen alle außer den Clips und
+`passbullets` (`Check.BlocksSight`).
+
+**Dust2:** 435.649 Dreiecke, eingelesen in 2 s. BVH gebaut in 0,2 s. **0,8 µs pro Sichtlinie**, also etwa 620
+Sichtlinien in 0,5 ms. Verglichen mit der Sicht-Markierung des Spiels in 154.109 Spieler-Paaren aus echten Matches:
+Wenn unsere Linie blockiert ist, sagt das Spiel nur in 0,2 % der Fälle „gesehen“.
+
 ## Was schon da ist: Sichtlinien
 
 Der Fog muss für jeden Spieler wissen: **Kann ich diesen Gegner sehen, oder ist eine Wand dazwischen?**
@@ -98,8 +119,7 @@ blockiert.
   der Standard dafür, weil es sehr schnell ist.
 - `LineOfSight.IsBlocked`: Prüft eine Linie gegen eine Liste von Dreiecken.
 
-Im Moment wird jedes Dreieck einzeln geprüft. Eine echte Karte hat aber Hunderttausende Dreiecke. Darum kommt als
-Nächstes eine **BVH**: ein Baum aus Kisten um die Dreiecke. Liegt die Linie nicht in einer Kiste, kann man alle
-Dreiecke darin auf einmal überspringen.
+- `Bvh`: ein Baum aus Kisten um die Dreiecke. Liegt die Linie nicht in einer Kiste, werden alle Dreiecke darin auf
+  einmal übersprungen. Ein Test vergleicht die BVH mit „jedes Dreieck prüfen“ an 2.000 Zufallslinien.
 
 Einheiten: CS2-Einheiten (ungefähr 2,5 cm), **Z zeigt nach oben**. Ein stehender Spieler hat die Augen bei etwa 64.

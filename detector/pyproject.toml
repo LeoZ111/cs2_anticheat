@@ -1,0 +1,13 @@
+[project]
+name = "cs2-detector"
+version = "0.1.0"
+description = "Finds cheaters in CS2 match data by things that are physically or logically impossible for humans."
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.26", "pandas>=2.0", "pyarrow>=15"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

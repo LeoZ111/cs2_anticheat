@@ -5,6 +5,8 @@ using AntiCheat.Core.TestMode.Cheats;
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Commands;
+using CounterStrikeSharp.API.Modules.Memory;
+using CounterStrikeSharp.API.Modules.Memory.DynamicFunctions;
 using CounterStrikeSharp.API.Modules.Cvars;
 using CounterStrikeSharp.API.Modules.Utils;
 using Microsoft.Extensions.Logging;
@@ -25,6 +27,7 @@ public sealed class CheatsModule
     private const float SpeedMultiplier = 1.5f;
 
     private readonly BasePlugin _plugin;
+    private readonly MapSight _sight;
     private readonly Func<bool> _testMode;
     private readonly PlayerCheats _cheats = new();
     private readonly EspGlows _glows = new();
@@ -32,9 +35,10 @@ public sealed class CheatsModule
     // Which enemies were sent to each player in the last CheckTransmit. A real cheat only knows these.
     private readonly Dictionary<int, HashSet<uint>> _transmittedTo = new();
 
-    public CheatsModule(BasePlugin plugin, Func<bool> testMode)
+    public CheatsModule(BasePlugin plugin, MapSight sight, Func<bool> testMode)
     {
         _plugin = plugin;
+        _sight = sight;
         _testMode = testMode;
     }
 
@@ -46,9 +50,38 @@ public sealed class CheatsModule
         _plugin.RegisterListener<Listeners.OnClientDisconnect>(slot => TurnAllOff(slot));
         _plugin.RegisterEventHandler<EventRoundStart>((_, _) => { _glows.RemoveAll(); return HookResult.Continue; });
         _plugin.AddTimer(0.5f, RefreshGlows, global::CounterStrikeSharp.API.Modules.Timers.TimerFlags.REPEAT);
+        VirtualFunctions.CBaseEntity_TakeDamageOldFunc.Hook(OnTakeDamage, HookMode.Pre);
     }
 
-    public void Unload() => _glows.RemoveAll();
+    public void Unload()
+    {
+        VirtualFunctions.CBaseEntity_TakeDamageOldFunc.Unhook(OnTakeDamage, HookMode.Pre);
+        _glows.RemoveAll();
+    }
+
+    // ---------- hit upgrade: real hits of an aimbot user become better hits ----------
+
+    private HookResult OnTakeDamage(DynamicHook hook)
+    {
+        if (!_testMode()) return HookResult.Continue;
+        var victim = hook.GetParam<CEntityInstance>(0);
+        var info = hook.GetParam<CTakeDamageInfo>(1);
+        if (victim.DesignerName != "player" || (info.BitsDamageType & DamageTypes_t.DMG_BULLET) == 0) return HookResult.Continue;
+
+        var attackerPawn = info.Attacker.Value?.As<CCSPlayerPawn>();
+        var attacker = attackerPawn?.OriginalController.Value;
+        if (attacker is null || !attacker.IsValid) return HookResult.Continue;
+
+        CheatKind? aimbot = _cheats.IsOn(attacker.Slot, CheatKind.AimRage) ? CheatKind.AimRage
+            : _cheats.IsOn(attacker.Slot, CheatKind.AimLegit) ? CheatKind.AimLegit : null;
+        if (aimbot is null) return HookResult.Continue;
+
+        var before = new Hit(info.Damage, (HitGroup)(int)info.HitGroupId);
+        var after = HitUpgrade.Apply(aimbot.Value, before);
+        info.Damage = after.Damage;
+        info.HitGroupId = (HitGroup_t)(int)after.Group;
+        return HookResult.Changed;
+    }
 
     private void OnCommand(CCSPlayerController? player, CommandInfo command)
     {
@@ -110,7 +143,41 @@ public sealed class CheatsModule
         foreach (int slot in _cheats.SlotsWith(CheatKind.Radar).ToList()) ApplyRadar(slot);
         foreach (int slot in _cheats.SlotsWith(CheatKind.AimLegit).ToList()) ApplyAim(slot, AimProfile.Legit);
         foreach (int slot in _cheats.SlotsWith(CheatKind.AimRage).ToList()) ApplyAim(slot, AimProfile.Rage);
+        foreach (int slot in _cheats.SlotsWith(CheatKind.Trigger).ToList()) ApplyTriggerHint(slot);
         foreach (int slot in _cheats.SlotsWith(CheatKind.Speed).ToList()) ApplySpeed(slot);
+    }
+
+    /// <summary>Enemies the cheater's game received and that are really visible (no wall between, map geometry).</summary>
+    private IEnumerable<(CCSPlayerPawn Pawn, Vector3 Head)> VisibleEnemies(CCSPlayerController cheater, Vector3 eye)
+    {
+        foreach (var pawn in KnownEnemyPawns(cheater))
+        {
+            if (pawn.AbsOrigin is null) continue;
+            Vector3 head = HeadPoint(pawn);
+            Vector3 chest = ToVector3(pawn.AbsOrigin) + new Vector3(0, 0, pawn.ViewOffset.Z * 0.75f);
+            if (_sight.IsClear(eye, head) || _sight.IsClear(eye, chest)) yield return (pawn, head);
+        }
+    }
+
+    // Shows "FEUER" in the middle of the screen while the crosshair is on a visible enemy.
+    // (A server cannot press the fire button for a human, so the hint is the closest we get to a triggerbot.)
+    private void ApplyTriggerHint(int slot)
+    {
+        var cheater = Utilities.GetPlayerFromSlot(slot);
+        var pawn = cheater?.PlayerPawn.Value;
+        if (cheater is null || pawn is null || !pawn.IsValid || pawn.LifeState != (byte)LifeState_t.LIFE_ALIVE || pawn.AbsOrigin is null) return;
+        Vector3 eye = ToVector3(pawn.AbsOrigin) + new Vector3(0, 0, pawn.ViewOffset.Z);
+        var current = new ViewAngles(pawn.EyeAngles.X, pawn.EyeAngles.Y);
+        foreach (var (_, head) in VisibleEnemies(cheater, eye))
+        {
+            Vector3 aimPoint = head - new Vector3(0, 0, 14f); // between head and chest
+            float error = AimMath.Distance(current, AimMath.AnglesTo(eye, aimPoint));
+            if (AimMath.IsOnBody(error, Vector3.Distance(eye, aimPoint)))
+            {
+                cheater.PrintToCenterHtml("<font color='#ff3030' class='fontSize-xl'>FEUER</font>");
+                return;
+            }
+        }
     }
 
     private IEnumerable<CCSPlayerPawn> KnownEnemyPawns(CCSPlayerController cheater)
@@ -146,11 +213,12 @@ public sealed class CheatsModule
         if (cheater is null || pawn is null || !pawn.IsValid || pawn.LifeState != (byte)LifeState_t.LIFE_ALIVE) return;
         if (pawn.AbsOrigin is null) return;
 
+        // Only while shooting: turning the view all the time fights the player's own mouse and stutters.
+        if ((cheater.Buttons & PlayerButtons.Attack) == 0) return;
+
         Vector3 eye = ToVector3(pawn.AbsOrigin) + new Vector3(0, 0, pawn.ViewOffset.Z);
         var current = new ViewAngles(pawn.EyeAngles.X, pawn.EyeAngles.Y);
-        var targets = KnownEnemyPawns(cheater)
-            .Where(p => p.AbsOrigin is not null)
-            .Select(p => new AimTarget((int)p.Index, HeadPoint(p)));
+        var targets = VisibleEnemies(cheater, eye).Select(e => new AimTarget((int)e.Pawn.Index, e.Head));
 
         AimTarget? target = AimMath.PickTarget(eye, current, targets, profile.FieldOfView);
         if (target is null) return;

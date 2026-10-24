@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Numerics;
 using AntiCheat.Core.Fog;
 using AntiCheat.Core.Geometry;
@@ -23,6 +23,7 @@ public sealed class FogModule
     private const float GunshotAudibleSeconds = 1.0f;
 
     private readonly BasePlugin _plugin;
+    private readonly MapSight _sight;
     private readonly Func<bool> _enabled;
     private readonly Action<bool> _setEnabled;
     private readonly Func<bool> _testMode;
@@ -34,9 +35,10 @@ public sealed class FogModule
     private long _ticks, _decisions, _hidden, _lines;
     private double _totalMs, _maxMs;
 
-    public FogModule(BasePlugin plugin, Func<bool> enabled, Action<bool> setEnabled, Func<bool> testMode)
+    public FogModule(BasePlugin plugin, MapSight sight, Func<bool> enabled, Action<bool> setEnabled, Func<bool> testMode)
     {
         _plugin = plugin;
+        _sight = sight;
         _enabled = enabled;
         _setEnabled = setEnabled;
         _testMode = testMode;
@@ -44,7 +46,11 @@ public sealed class FogModule
 
     public void Register()
     {
-        _plugin.RegisterListener<Listeners.OnMapStart>(LoadMap);
+        _sight.Loaded += () =>
+        {
+            _loadedMap = _sight.Map;
+            _fog = _sight.Walls is null ? null : new FogSystem(_sight.Walls);
+        };
         _plugin.RegisterListener<Listeners.OnTick>(OnTick);
         _plugin.RegisterListener<Listeners.CheckTransmit>(OnCheckTransmit);
         _plugin.RegisterListener<Listeners.OnClientDisconnect>(slot => _fog?.Forget(slot));
@@ -58,24 +64,6 @@ public sealed class FogModule
         });
         _plugin.AddCommand("css_fog", Info.Description, OnFogCommand);
         _plugin.AddCommand("css_fog_stats", "Fog statistics", (_, command) => command.ReplyToCommand(StatsText()));
-        LoadMap(Server.MapName);
-    }
-
-    private void LoadMap(string map)
-    {
-        _fog = null;
-        _loadedMap = map;
-        string path = Path.Combine(_plugin.ModuleDirectory, "maps", map + ".actri");
-        if (!File.Exists(path))
-        {
-            _plugin.Logger.LogWarning("Fog: no geometry for {Map} ({Path}). Fog is off on this map.", map, path);
-            return;
-        }
-        var watch = Stopwatch.StartNew();
-        MapGeometry geometry;
-        using (var stream = File.OpenRead(path)) geometry = MapGeometry.Read(stream);
-        _fog = new FogSystem(new Bvh(geometry.Where(MapGeometry.BlocksSight)));
-        _plugin.Logger.LogInformation("Fog: loaded {Map} ({Count} triangles) in {Ms} ms", map, geometry.Triangles.Count, watch.ElapsedMilliseconds);
     }
 
     private void OnFogCommand(CCSPlayerController? player, CommandInfo command)
@@ -89,7 +77,7 @@ public sealed class FogModule
         bool on = arg switch { "on" or "an" or "1" => true, "off" or "aus" or "0" => false, _ => !_enabled() };
         _setEnabled(on);
         ResetStats();
-        string geometry = _fog is null ? $" {ChatColors.Red}(keine Karten-Geometrie fÃ¼r {_loadedMap}!)" : "";
+        string geometry = _fog is null ? $" {ChatColors.Red}(keine Karten-Geometrie für {_loadedMap}!)" : "";
         Server.PrintToChatAll($" {ChatColors.Green}[AntiCheat]{ChatColors.Default} Fog of War: {(on ? $"{ChatColors.Green}AN" : $"{ChatColors.Grey}aus")}{geometry}");
     }
 

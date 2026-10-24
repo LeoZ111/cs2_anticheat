@@ -10,6 +10,7 @@ public enum CheatKind
     Esp,
     AimLegit,
     AimRage,
+    Trigger,
     Speed,
     Bhop,
 }
@@ -22,8 +23,9 @@ public static class CheatCatalog
     {
         new CheatInfo(CheatKind.Radar, "radar", "Radar-Hack: alle Gegner auf dem Radar"),
         new CheatInfo(CheatKind.Esp, "esp", "ESP/Wallhack: Gegner leuchten durch Wände"),
-        new CheatInfo(CheatKind.AimLegit, "aim_legit", "Aimbot legit: zieht sanft zum Kopf, kleines Sichtfeld"),
-        new CheatInfo(CheatKind.AimRage, "aim_rage", "Aimbot rage: schnappt sofort auf jeden Kopf"),
+        new CheatInfo(CheatKind.AimLegit, "aim_legit", "Aimbot legit: beim Schießen sanft zum sichtbaren Kopf, Treffer etwas stärker"),
+        new CheatInfo(CheatKind.AimRage, "aim_rage", "Aimbot rage: beim Schießen auf den sichtbaren Kopf, jeder Treffer = Kopfschuss"),
+        new CheatInfo(CheatKind.Trigger, "trigger", "Triggerbot-Hilfe: zeigt FEUER, wenn dein Fadenkreuz auf einem sichtbaren Gegner ist"),
         new CheatInfo(CheatKind.Speed, "speed", "Speedhack: 50 % schneller laufen"),
         new CheatInfo(CheatKind.Bhop, "bhop", "Bunnyhop: Springen halten (gilt für alle auf dem Server)"),
     };

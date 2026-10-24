@@ -59,21 +59,29 @@ Am Ende steht `Bestanden!` (oder `Passed!`) mit der Zahl der Tests.
 
 Mit `/` statt `!` sehen die anderen den Befehl nicht im Chat.
 
-### Simulierte Cheats (nur mit `ac_testmode 1`)
+### Simulierte Cheats (nur im Testmodus)
+
+Der Testmodus ist an, wenn im Plugin-Ordner auf dem Server die Datei `testmode.enabled` liegt (dann auch nach jedem
+Neuladen und Neustart), oder für den Moment mit `ac_testmode 1`. **Auf einem echten Server diese Datei nie anlegen.**
 
 | Im Chat | Was passiert |
 | --- | --- |
 | `!cheat` | Liste aller Cheats und ob sie an sind |
 | `!cheat radar` | Radar-Hack: alle Gegner auf deinem Radar |
 | `!cheat esp` | ESP/Wallhack: Gegner leuchten durch Wände, nur für dich |
-| `!cheat aim_legit` | Aimbot legit: zieht sanft zum Kopf, nur nahe am Fadenkreuz (12°) |
-| `!cheat aim_rage` | Aimbot rage: schnappt sofort auf jeden Kopf |
+| `!cheat aim_legit` | Aimbot legit: **nur beim Schießen** sanft zum **sichtbaren** Kopf (12°), Körpertreffer 1,5× stärker |
+| `!cheat aim_rage` | Aimbot rage: **nur beim Schießen** auf den nächsten **sichtbaren** Kopf, **jeder Treffer zählt als Kopfschuss** |
+| `!cheat trigger` | Triggerbot-Hilfe: zeigt **FEUER**, solange dein Fadenkreuz auf einem sichtbaren Gegner ist |
 | `!cheat speed` | Speedhack: 50 % schneller |
 | `!cheat bhop` | Bunnyhop (gilt für alle auf dem Server, weil CS2 das nur für alle kann) |
 
 `!cheat esp` schaltet um, `!cheat esp on` / `off` schaltet fest. Alles läuft auf dem Server. Wie echte Cheats
 nutzen die Cheats nur Gegner, die der Server an dein Spiel schickt. Mit Fog werden sie also blind.
-**Noch nicht:** Der Aimbot prüft keine Wände (dafür braucht es die Karten-Geometrie), und schießen musst du selbst.
+**Warum so:** In CS2 entscheidet das Spiel des Spielers, wohin die Kugel fliegt. Dreht der Server die Sicht dauernd,
+kämpft das gegen die Maus und ruckelt. Deshalb dreht der Aimbot nur beim Schießen und nur zu Gegnern, die laut
+Kartengeometrie (`MapSight`) wirklich sichtbar sind. Dazu werden **echte Treffer verstärkt** (Schadens-Hook,
+`HitUpgrade` im Kern). **Fehlschüsse** bleiben Fehlschüsse, denn echtes Silent Aim bräuchte ein eigenes C++-Plugin.
+Ein Server kann für einen Menschen nicht abdrücken, deshalb zeigt der Triggerbot nur einen Hinweis.
 
 Echtes Tab-Vervollständigen beim Tippen gibt es in CS2 nicht: Der Server sieht eine Nachricht erst nach Enter.
 Darum zeigt `!` + Anfang + Enter die passenden Befehle. **Jeder neue Chat-Befehl muss in `AntiCheatPlugin.cs` bei

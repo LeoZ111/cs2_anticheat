@@ -35,17 +35,29 @@ public class AntiCheatPlugin : BasePlugin
         // Logger writes to the server console and to addons/counterstrikesharp/logs.
         Logger.LogInformation("Hallo! Plugin geladen. Kern-Selbsttest: {Result}", CoreSelfTest() ? "OK" : "FEHLER");
 
+        // A test server marks itself with this file, so test mode survives plugin reloads and restarts.
+        // Never create it on a real server.
+        if (File.Exists(Path.Combine(ModuleDirectory, "testmode.enabled")))
+        {
+            TestMode.Value = true;
+            Logger.LogInformation("Test mode is on (testmode.enabled found).");
+        }
+
         // The fog must register before the cheats: its CheckTransmit runs first, so the simulated cheats
         // only see what the fog lets through, like real cheats.
-        _fog = new FogModule(this, () => FogEnabled.Value, on => FogEnabled.Value = on, () => TestMode.Value);
+        var sight = new MapSight(this);
+        _fog = new FogModule(this, sight,() => FogEnabled.Value, on => FogEnabled.Value = on, () => TestMode.Value);
         _fog.Register();
 
         // Test-mode commands. Only for our own test server.
         BotSkillCommand.Register(this);
         BotPositionsCommand.Register(this);
         SettingsCommands.Register(this);
-        _cheats = new CheatsModule(this, () => TestMode.Value);
+        _cheats = new CheatsModule(this, sight, () => TestMode.Value);
         _cheats.Register();
+
+        // Load the walls last, so the fog and the cheats already listen for them.
+        sight.Register();
 
         // Every chat command must be listed here, so "!" and "!<beginning>" can show it.
         ChatHelp.Register(this, SettingsCommands.Infos

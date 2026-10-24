@@ -61,6 +61,16 @@ public static class AimMath
         return y;
     }
 
+    /// <summary>
+    /// Is the crosshair on the enemy's body? About 16 units to each side of the aim point,
+    /// so the allowed angle shrinks with distance (never below the minimum).
+    /// </summary>
+    public static bool IsOnBody(float errorDegrees, float distance, float halfWidth = 16f, float minimum = 1.0f)
+    {
+        float allowed = MathF.Max(minimum, MathF.Atan2(halfWidth, MathF.Max(distance, 1f)) * RadToDeg);
+        return errorDegrees <= allowed;
+    }
+
     /// <summary>The target closest to the crosshair inside the field of view, or null.</summary>
     public static AimTarget? PickTarget(Vector3 eye, ViewAngles current, IEnumerable<AimTarget> targets, float fieldOfView)
     {

@@ -44,6 +44,28 @@ public static class ChatCommandCatalog
         return space < 0 ? (body, "") : (body[..space], body[(space + 1)..].Trim());
     }
 
+    /// <summary>
+    /// "!cheat esp bind:F5" -> ("cheat esp", "F5"). Returns null if the message has no valid bind:KEY part.
+    /// Keys: letters, digits and names like F5, mouse4, kp_end.
+    /// </summary>
+    public static (string Command, string Key)? ExtractBind(string message)
+    {
+        var parts = Split(message);
+        if (parts is null) return null;
+        string full = (parts.Value.Command + " " + parts.Value.Arguments).Trim();
+        var words = full.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
+        int index = words.FindIndex(w => w.StartsWith("bind:", StringComparison.OrdinalIgnoreCase));
+        if (index < 0) return null;
+        string key = words[index]["bind:".Length..];
+        if (key.Length == 0 || !key.All(c => char.IsAsciiLetterOrDigit(c) || c == '_')) return null;
+        words.RemoveAt(index);
+        if (words.Count == 0) return null;
+        return (string.Join(' ', words), key.ToLowerInvariant());
+    }
+
+    /// <summary>The console line that makes a key run a chat command silently, e.g. bind "f5" "say /cheat esp".</summary>
+    public static string BindLine(string key, string command) => $"bind \"{key}\" \"say /{command}\"";
+
     /// <summary>One help line, e.g. "!bot_skill [noob|...] – Bot-Stärke einstellen".</summary>
     public static string HelpLine(ChatCommandInfo command)
     {

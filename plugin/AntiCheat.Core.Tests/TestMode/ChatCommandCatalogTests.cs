@@ -63,6 +63,32 @@ public class ChatCommandCatalogTests
         Assert.Null(ChatCommandCatalog.Split(message));
     }
 
+    [Theory]
+    [InlineData("!cheat esp bind:F5", "cheat esp", "f5")]
+    [InlineData("/cheat bind:mouse4 aim_rage", "cheat aim_rage", "mouse4")]
+    [InlineData("!fog on bind:kp_end", "fog on", "kp_end")]
+    public void BindIsFoundAnywhereInTheMessage(string message, string command, string key)
+    {
+        Assert.Equal((command, key), ChatCommandCatalog.ExtractBind(message));
+    }
+
+    [Theory]
+    [InlineData("!cheat esp")]
+    [InlineData("!cheat esp bind:")]
+    [InlineData("!cheat esp bind:F5;quit")]
+    [InlineData("!bind:F5")]
+    [InlineData("hallo bind:F5")]
+    public void InvalidOrMissingBindGivesNull(string message)
+    {
+        Assert.Null(ChatCommandCatalog.ExtractBind(message));
+    }
+
+    [Fact]
+    public void BindLineRunsTheCommandSilently()
+    {
+        Assert.Equal("bind \"f5\" \"say /cheat esp\"", ChatCommandCatalog.BindLine("f5", "cheat esp"));
+    }
+
     [Fact]
     public void HelpLineShowsNameArgumentsAndDescription()
     {

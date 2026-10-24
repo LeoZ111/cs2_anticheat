@@ -36,6 +36,17 @@ public static class ChatHelp
         {
             return HookResult.Continue;
         }
+
+        // "!cheat esp bind:F5": the server cannot set keys in the player's game, so we show the console line to paste.
+        var bind = ChatCommandCatalog.ExtractBind(info.ArgString);
+        if (bind is not null)
+        {
+            string line = ChatCommandCatalog.BindLine(bind.Value.Key, bind.Value.Command);
+            player.PrintToChat($" {ChatColors.Green}[AntiCheat]{ChatColors.Default} In die Konsole kopieren (^):");
+            player.PrintToChat($" {ChatColors.Gold}{line}");
+            player.PrintToConsole(line);
+            return HookResult.Handled;
+        }
         (string name, string rest) = parts.Value;
         bool silent = info.ArgString.TrimStart('"', ' ').StartsWith('/');
         HookResult done = silent ? HookResult.Handled : HookResult.Continue;

@@ -35,6 +35,14 @@ public class AntiCheatPlugin : BasePlugin
         // Logger writes to the server console and to addons/counterstrikesharp/logs.
         Logger.LogInformation("Hallo! Plugin geladen. Kern-Selbsttest: {Result}", CoreSelfTest() ? "OK" : "FEHLER");
 
+        // A test server marks itself with this file, so test mode survives plugin reloads and restarts.
+        // Never create it on a real server.
+        if (File.Exists(Path.Combine(ModuleDirectory, "testmode.enabled")))
+        {
+            TestMode.Value = true;
+            Logger.LogInformation("Test mode is on (testmode.enabled found).");
+        }
+
         // The fog must register before the cheats: its CheckTransmit runs first, so the simulated cheats
         // only see what the fog lets through, like real cheats.
         var sight = new MapSight(this);

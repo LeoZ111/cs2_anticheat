@@ -59,7 +59,10 @@ Am Ende steht `Bestanden!` (oder `Passed!`) mit der Zahl der Tests.
 
 Mit `/` statt `!` sehen die anderen den Befehl nicht im Chat.
 
-### Simulierte Cheats (nur mit `ac_testmode 1`)
+### Simulierte Cheats (nur im Testmodus)
+
+Der Testmodus ist an, wenn im Plugin-Ordner auf dem Server die Datei `testmode.enabled` liegt (dann auch nach jedem
+Neuladen und Neustart), oder für den Moment mit `ac_testmode 1`. **Auf einem echten Server diese Datei nie anlegen.**
 
 | Im Chat | Was passiert |
 | --- | --- |
